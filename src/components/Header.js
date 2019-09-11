@@ -1,6 +1,6 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
-import { Nav, Navbar } from 'react-bootstrap'
+import { Nav, Navbar, Form, FormControl } from 'react-bootstrap'
 
 class Header extends React.Component {
 
@@ -13,8 +13,7 @@ class Header extends React.Component {
         window.isLoggedIn = true;
         window.user = window.gAuth.currentUser.get().getBasicProfile();
         console.log(window.user);
-        document.getElementById("userName").innerHTML = window.user.getName();
-        document.getElementById("btnLogin").value = "Log out";
+        document.getElementById("btnLogin").value = window.user.getGivenName() + "- Sign out";
       });
     }
     else
@@ -23,8 +22,7 @@ class Header extends React.Component {
         console.log('gAuth.signOut');
         window.isLoggedIn = false;
         window.user = null;
-        document.getElementById("userName").innerHTML = "";
-        document.getElementById("btnLogin").value = "Log in";
+        document.getElementById("btnLogin").value = "Sign in with Google";
       })
     }
   }
@@ -32,7 +30,7 @@ class Header extends React.Component {
   render() {
     return (
       <header>
-        <Navbar bg="light" expand="lg" bg="dark" variant="dark">
+        <Navbar expand="lg" bg="dark" variant="dark">
         <Navbar.Brand href="/">Finance Calculator</Navbar.Brand>
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
         <Navbar.Collapse id="basic-navbar-nav">
@@ -40,8 +38,10 @@ class Header extends React.Component {
                 <Nav.Link href='/mortgage'>Mortgage Calculator</Nav.Link>
                 <Nav.Link href='/loan'>Loan Calculator</Nav.Link>
                 <Nav.Link href='/savings'>Savings Calculator</Nav.Link>
-                <Nav><span id="userName"></span><input type="button" id="btnLogin" value="Sign in with Google" onClick={this.handleLoginBtn} /></Nav>
             </Nav>
+            <Form inline>
+              <FormControl type="button" id="btnLogin" value="Sign in with Google" onClick={this.handleLoginBtn} className="mr-sm-2" />
+            </Form>
         </Navbar.Collapse>
         </Navbar>
   
