@@ -1,18 +1,26 @@
 import React from 'react'
 import ScrollUpButton from 'react-scroll-up-button'
-import { Form, Row, Col, Button, Table, OverlayTrigger, Card } from 'react-bootstrap'
+import { Container, Form, Row, Col, Button, Table, Card } from 'react-bootstrap'
 import { inputNumberFormat, uncomma, comma } from '../js/comma.js'
+import queryString from 'query-string'
 
-class Mortgage extends React.Component {
+class Mortgage extends React.Component 
+{
 
-  constructor(props) {
+  constructor(props) 
+  {
     super(props);
+    const qs = queryString.parse(this.props.location.search);
     this.state = {
       homePrice: '',
       downPayment: '',
       rate: 0,
-      term: 1,
+      term: 0,
       option: 'monthly',
+      result: 0,
+      mortgageAmount: 0,
+      totalInterest: 0,
+      totalPayment: 0,
       detail: []
     }
 
@@ -20,13 +28,21 @@ class Mortgage extends React.Component {
     this.mortgageCalc = this.mortgageCalc.bind(this);
   }
 
-  handleInputChange(event) {
+  handleInputChange(event) 
+  {
+    event.persist();
     const name = event.target.name;
-    const value = (name == "homePrice" || name == "downPayment") ? inputNumberFormat(event.target.value) : event.target.value;
-    this.setState({ [name]: value});
+    const value = (name === "homePrice" || name === "downPayment") ? inputNumberFormat(event.target.value) : event.target.value;
+    this.setState({
+      [name]: value
+    },() => {
+      if (name === "option" && this.state.result > 0)
+        this.mortgageCalc(event);
+    });
   }
 
-  mortgageCalc(event) {
+  mortgageCalc(event) 
+  {
     event.preventDefault();
     
     // Variable Declaration
@@ -35,6 +51,8 @@ class Mortgage extends React.Component {
     const rate = this.state.rate;
     const year = this.state.term;
     const option = this.state.option;
+
+    console.log(home, down, rate, year, option);
     
     // Calculation
     const mortgage = +home - down;
@@ -63,7 +81,7 @@ class Mortgage extends React.Component {
     totalPayment = result * n;
     totalInterest = totalPayment - mortgage;
 
-    var detailArray = this.state.detail;
+    var detailArray = [];
     for (let t = 1; t <= n; t++)
     {
       let interest = balance * i;
@@ -78,19 +96,23 @@ class Mortgage extends React.Component {
       
     }
 
-    this.setState({ detail: detailArray });
-
     // Display Results
+    this.setState({
+      result: comma(Math.round(result, 0)),
+      mortgageAmount: comma(mortgage),
+      totalInterest: comma(Math.round(totalInterest, 0)),
+      totalPayment: comma(Math.round(totalPayment, 0)),
+      detail: detailArray,
+    });
     document.getElementById("mortgageResultDiv").style.display = "block";
-    document.getElementById("mortgageTitle").innerHTML = `Your ${option} mortgage payment will be `;
-    document.getElementById("mortgageResult").innerHTML = '$' + comma(Math.round(result, 0));
   }
 
-  render () {
+  render () 
+  {
     return (
       <div>
         <div className="bigFont margin"><b>Mortgage Calculator</b></div>
-        <Form onSubmit = {this.mortgageCalc}>
+        <Form onSubmit = {this.mortgageCalc} method="get">
           <Form.Group as={Row}>
             <Form.Label column sm={5}>
               Home Price ($)
@@ -168,14 +190,31 @@ class Mortgage extends React.Component {
           </Form.Group>
         </Form>
 
+        {/* Display Results */}
         <div id ="mortgageResultDiv">
           <Card>
             <Card.Body>
-              <div id = "mortgageTitle"></div>
-              <div id = "mortgageResult" className="center bigFont"></div><br/>
+              <div className="center">Your {this.state.option} mortgage payment will be</div>
+              <div className="center bigFont">$ {this.state.result}</div>
+              <Container>
+                <Row>
+                  <Col xs={6}>Mortgage</Col>
+                  <Col xs={6}>$ {this.state.mortgageAmount}</Col>
+                </Row>
+                <Row>
+                  <Col xs={6}>Total Interest</Col>
+                  <Col xs={6}>$ {this.state.totalInterest}</Col>
+                </Row>
+                <Row>
+                  <Col xs={6}>Total Payment</Col>
+                  <Col xs={6}>$ {this.state.totalPayment}</Col>
+                </Row>
+              </Container>
             </Card.Body>
           </Card>
           <br/>
+
+          {/* Result Details */}
           <Table responsive>
             <tbody>
               <tr>
@@ -196,6 +235,7 @@ class Mortgage extends React.Component {
               })}
             </tbody>
           </Table>
+          
         </div>
 
         <ScrollUpButton />

@@ -4,6 +4,16 @@ import { Nav, Navbar, Form, FormControl } from 'react-bootstrap'
 
 class Header extends React.Component {
 
+  /*
+  constructor(props){
+    super(props);
+    this.state = {
+      isLoggedIn: window.isLoggedIn,
+      userName: window.userName
+    }
+    console.log('constructing: ' + this.state.isLoggedIn + ', ' + this.state.userName);
+  }
+  */
   handleLoginBtn()
   {
     if (!window.gAuth.isSignedIn.get())
@@ -11,9 +21,8 @@ class Header extends React.Component {
       window.gAuth.signIn().then(function(){
         console.log('gAuth.signIn');
         window.isLoggedIn = true;
-        window.user = window.gAuth.currentUser.get().getBasicProfile();
-        console.log(window.user);
-        document.getElementById("btnLogin").value = window.user.getGivenName() + "- Sign out";
+        window.userName = window.gAuth.currentUser.get().getBasicProfile().getGivenName();
+        document.getElementById("btnLogin").value = window.userName + "- Sign out";
       });
     }
     else
@@ -21,13 +30,17 @@ class Header extends React.Component {
       window.gAuth.signOut().then(function(){
         console.log('gAuth.signOut');
         window.isLoggedIn = false;
-        window.user = null;
+        window.userName = "";
         document.getElementById("btnLogin").value = "Sign in with Google";
       })
     }
   }
 
   render() {
+
+    if(window.isLoggedIn && document.getElementById("btnLogin").value == "Sign in with Google")
+      document.getElementById("btnLogin").value = window.userName + " - Sign out";
+
     return (
       <header>
         <Navbar expand="lg" bg="dark" variant="dark">
