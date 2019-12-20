@@ -1,38 +1,81 @@
 import React from 'react'
-import ScrollUpButton from 'react-scroll-up-button'
-import { Form, Row, Col, Button, Table, Card } from 'react-bootstrap'
+import { Container, Form, Row, Col, Button, Card } from 'react-bootstrap'
 import { inputNumberFormat, uncomma, comma } from '../js/comma.js'
+import PieChart from 'react-minimal-pie-chart';
 
-class Loan extends React.Component {
+export default class Loan extends React.Component 
+{
 
-  constructor(props) {
+  constructor(props) 
+  {
     super(props);
     this.state = {
-      loanAmount: '',
-      rate: 0,
-      term: 1,
+      loan: '10,000',
+      rate: 5.1,
+      term: 5,
       option: 'monthly',
-      detail: []
+
+      showResult: false,
+      result: '',
+      n: 0,
+      loanAmount: 0,
+      totalInterest: 0,
+      totalPayment: 0,
+      amortization_option: 0,
+      detail: [],
+      detailYear: [],
     }
 
     this.handleInputChange = this.handleInputChange.bind(this);
-    this.doCalculation = this.doCalculation.bind(this);
+    this.calculate = this.calculate.bind(this);
   }
 
-  handleInputChange(event) {
+  handleInputChange(event) 
+  {
+    event.persist();
     const name = event.target.name;
-    const value = (name == "loanAmount") ? inputNumberFormat(event.target.value) : event.target.value;
-    this.setState({ [name]: value});
+    let value = event.target.value;
+
+    if (name === 'loan') {
+        value = inputNumberFormat(value);
+    }
+
+    this.setState({
+      [name]: value
+    },() => {
+      if (name === "option" && this.state.result !== '') {
+        this.calculate(event);
+      }
+    });
   }
 
-  doCalculation(event) {
+  calculate(event) 
+  {
     event.preventDefault();
     
     // Variable Declaration
-    const loan = uncomma(this.state.loanAmount);
+    const loan = parseFloat(uncomma(this.state.loan));
     const rate = this.state.rate;
     const year = this.state.term;
     const option = this.state.option;
+
+    // Validation
+    let isValid = false;
+    console.log(loan, rate, year, option);
+    if (loan === '') {
+      alert('Please fill in the Loan Amount');
+    } else if (rate < 0) {
+      alert('Interest Rate can not be a negative value')
+    } else if (year === 0 || year === '') {
+      alert('Please fill in the loan years')
+    } else {
+      isValid = true;
+    }
+
+    if (!isValid) {
+      return;
+    }
+
     
     // Calculation
     let balance = loan;
@@ -40,7 +83,7 @@ class Loan extends React.Component {
     let divider = 1;
     if (option === "monthly")
       divider = 12;
-    else if (option === "bi-Weekly")
+    else if (option === "bi-weekly")
       divider = 26;
     else if (option === "weekly")
       divider = 52;
@@ -60,64 +103,83 @@ class Loan extends React.Component {
     totalPayment = result * n;
     totalInterest = totalPayment - loan;
 
-    var detailArray = this.state.detail;
-    for (let t = 1; t <= n; t++)
-    {
-      let interest = balance * i;
-      let principal = result - interest;
+    // Calculate details
+    let interest, principal, yearInterest = 0, yearPrincipal = 0;
+    var detailArray = [];
+    var detailArrayYear = [];
+    for (let t = 1; t <= n; t++) {
+      interest = balance * i;
+      yearInterest += interest;
+      principal = result - interest;
+      yearPrincipal += principal;
       balance = balance - principal;
 
       detailArray = detailArray.concat({
-                                No: t, 
-                                Principal: comma(Math.round(principal, 0)), 
-                                Interest: comma(Math.round(interest, 0)), 
-                                Balance: comma(Math.round(balance, 0))});
+        No: t, 
+        Payment: comma(Math.round(result, 0)),
+        Principal: comma(Math.round(principal, 0)), 
+        Interest: comma(Math.round(interest, 0)), 
+        Balance: comma(Math.round(balance, 0))});
+                                
+      if (t % divider === 0) {
+        detailArrayYear = detailArrayYear.concat({
+            No: t / divider,
+            Payment: comma(Math.round(result * t, 0)),
+            Principal: comma(Math.round(yearPrincipal, 0)), 
+            Interest: comma(Math.round(yearInterest, 0)), 
+            Balance: comma(Math.round(balance, 0))});
+      }
       
     }
 
-    this.setState({ detail: detailArray });
-
     // Display Results
-    document.getElementById("loanResultDiv").style.visibility = "visible";
-    document.getElementById("loanTitle").innerHTML = `Your ${option} loan payment will be `;
-    document.getElementById("loanResult").innerHTML = '$' + comma(Math.round(result, 0));
-
-
+    this.setState({
+      showResult: true,
+      result: comma(Math.round(result, 0)),
+      n: n,
+      loanAmount: comma(loan),
+      totalInterest: comma(Math.round(totalInterest, 0)),
+      totalPayment: comma(Math.round(totalPayment, 0)),
+      detail: detailArray,
+      detailYear: detailArrayYear,
+    }, () => {
+      const resultDiv = document.getElementById("resultDiv");
+      resultDiv.scrollIntoView();
+    });
   }
 
-
-
-  render () {
+  render () 
+  {
     return (
-      <div>
-        <div className="bigFont margin"><b>Loan Calculator</b></div>
-        <Form onSubmit = {this.doCalculation}>
+      <div className="smallContainer">
+        <div className="pageTitle">Loan Calculator</div>
+        <p className="fontRailway marginBottom"><b>Quickly See What Your Loan Payments Might Look Like</b></p>
+        <Form onSubmit = {this.calculate} method="get">
           <Form.Group as={Row}>
             <Form.Label column sm={5}>
               Loan Amount ($)
             </Form.Label>
             <Col sm={7}>
               <Form.Control 
+                keyboardtype="number-pad"
                 type="text" 
-                name = "loanAmount" 
-                placeholder="Loan Amount" 
-                onChange = {this.handleInputChange}
-                value = {this.state.loanAmount} />
+                name="loan" 
+                onChange={this.handleInputChange}
+                value={this.state.loan} />
             </Col>
           </Form.Group>
-
+    
           <Form.Group as={Row}>
             <Form.Label column sm={5}>
               Interest Rate (%)
             </Form.Label>
             <Col sm={7}>
               <Form.Control 
+                  keyboardtype="decimal-pad"
                   type="number" 
-                  step=".01"
-                  name = "rate" 
-                  placeholder="rate (%)" 
-                  onChange = {this.handleInputChange}
-                  min = "0" />
+                  name="rate" 
+                  value={this.state.rate}
+                  onChange = {this.handleInputChange} />
             </Col>
           </Form.Group>
 
@@ -127,22 +189,22 @@ class Loan extends React.Component {
             </Form.Label>
             <Col sm={7}>
               <Form.Control 
+                  keyboardtype="number-pad"
                   type="number" 
-                  name = "term" 
-                  placeholder="years" 
-                  onChange = {this.handleInputChange}
-                  min = "1" />
+                  name="term" 
+                  value={this.state.term}
+                  onChange={this.handleInputChange} />
             </Col>
           </Form.Group>
 
           <Form.Group as={Row}>
             <Form.Label column sm={5}>
-              Payment Option
+              Payment Frequency
             </Form.Label>
             <Col sm={7}>
               <Form.Control as="select" name="option" value={this.state.option} onChange={this.handleInputChange}>
                 <option value="monthly">Monthly</option>
-                <option value="bi-Weekly">Bi-Weekly</option>
+                <option value="bi-weekly">Bi-Weekly</option>
                 <option value="weekly">Weekly</option>
               </Form.Control>
             </Col>
@@ -150,46 +212,123 @@ class Loan extends React.Component {
     
           <Form.Group as={Row}>
             <Col sm={{ span: 7, offset: 5 }}>
-              <Button type="submit" block>Calculate</Button>
+              <Button variant="warning" type="submit" block>Calculate</Button>
             </Col>
           </Form.Group>
         </Form>
-        
-        <div id = "loanResultDiv">
-          <Card>
+        <br/>
+        {this._renderResult()}
+      </div>
+    );
+  }
+
+  _renderResult() {
+    if (this.state.showResult) {
+      const total = this.state.totalPayment;
+      const principal = this.state.loan;
+      const interest = this.state.totalInterest;
+      const result = this.state.result;
+      const chartData = [
+        { title: 'Principal', value: parseFloat(uncomma(principal)), color: '#87c0c4' },
+        { title: 'Interest', value: parseFloat(uncomma(interest)), color: '#ffc74f' },
+      ];
+      return (
+        <div id="resultDiv">
+          <Card bg="light">
             <Card.Body>
-              <div id = "loanTitle" className="center"></div>
-              <div id = "loanResult" className="center bigFont"></div>
+              <div className="center">Your <b>{this.state.option}</b> loan payment will be</div>
+              <h1 className="center">$ {result}</h1>
+              <p className="center">{this.state.n} payments ({this.state.term} years)</p>
             </Card.Body>
           </Card>
+
+          <p className="sectionTitle">Loan Analysis</p>
+          <p>
+            Your total payment is calculated as <b>${total}</b> (${result} x {this.state.n} payments) which consists of principal and interest.<br/>
+          </p>
+          <Card><Card.Body>
+            <PieChart
+              data={chartData}
+              style={{ height: '200px' }}
+              label={({ data, dataIndex }) =>
+                data[dataIndex].title + " " + Math.round(data[dataIndex].percentage) + '%'
+              }
+              labelPosition={50}
+              labelStyle={{ fill: '#000', fontSize: '7px'}}
+            />
+            
+            <div className='divider' />
+
+            <Container>
+              <Row>
+                <Col xs={6} className="text-right">Principal</Col>
+                <Col xs={6}>$ {principal}</Col>
+              </Row>
+              <Row>
+                <Col xs={6} className="text-right">Interest</Col>
+                <Col xs={6}>$ {interest}</Col>
+              </Row>
+              <Row>
+                <Col xs={6} className="text-right"><b>Total</b></Col>
+                <Col xs={6}><b>$ {total}</b></Col>
+              </Row>
+            </Container>
+          </Card.Body></Card>
+
+          <p className="sectionTitle">Amortization Schedule</p>          
+          <p>
+            Your {this.state.option} payment of <b>${this.state.result}</b> consists of <b>principal</b> and <b>interest</b> which change over time.<br/>
+            As you pay off the loan, interest decreases and principal increases in each payment.
+          </p>
           <br/>
-          <Table responsive>
+          <Form>
+              <div key="inline-radio" className="mb-3">
+                <Form.Check 
+                  inline 
+                  name="schedule"
+                  label="Each payment" 
+                  type="radio" 
+                  checked={this.state.amortization_option === 0}
+                  onChange={() => this.setState({amortization_option: 0})}
+                  id="radio-cycle"/>
+                <Form.Check 
+                  inline 
+                  name="schedule"
+                  label="Cumulative(yearly)" 
+                  type="radio" 
+                  onChange={() => this.setState({amortization_option: 1})}
+                  id="radio-year"/>
+              </div>
+          </Form>
+          <table className="tableAmortization">
             <tbody>
-              <tr>
+              <tr className="trAmortization tableHeader">
                 <td>#</td>
+                <td>Balance</td>
+                <td>Payment</td>
                 <td>Principal</td>
                 <td>Interest</td>
-                <td>Balance</td>
               </tr>
-              {this.state.detail.map((row, index) => {
+              {(this.state.amortization_option === 0 ? this.state.detail : this.state.detailYear).map((row, index) => {
                 return (
-                    <tr key={index}>
+                    <tr key={index} className="trAmortization">
                       <td>{row.No}</td>
+                      <td className="fontPrimary">{row.Balance}</td>
+                      <td>{row.Payment}</td>
                       <td>{row.Principal}</td>
                       <td>{row.Interest}</td>
-                      <td>{row.Balance}</td>
                     </tr>
                 )
               })}
             </tbody>
-          </Table>
-        </div> 
-
-        <ScrollUpButton />
-
-      </div>
-    );
+          </table>
+          
+        </div>
+      )
+    } else {
+      return (
+        <div></div>
+      )
+    }
   }
 }
-
-export default Loan

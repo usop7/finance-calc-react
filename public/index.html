@@ -9,7 +9,6 @@
       name="description"
       content="Web site created using create-react-app"
     />
-    <meta name="google-signin-client_id" content="743045266328-agnvq2dld8h6947t45g5lb5m91b5gs7c.apps.googleusercontent.com">
     <!--
       manifest.json provides metadata used when your web app is installed on a
       user's mobile device or desktop. See https://developers.google.com/web/fundamentals/web-app-manifest/
@@ -25,28 +24,7 @@
       Learn how to configure a non-root public URL by running `npm run build`.
     -->
 
-    <script>
-      var gAuth;
-      var isLoggedIn = false;
-      var userName = "";
-
-      function init()
-      {
-        console.log('init');
-        gapi.load('auth2', function() 
-        {
-          console.log('auth2');
-          gAuth = gapi.auth2.init({
-            client_id:'743045266328-agnvq2dld8h6947t45g5lb5m91b5gs7c.apps.googleusercontent.com'
-          });
-          gAuth.then(function(){
-            console.log('googleAuth success');
-          }, function(){
-            console.log('googleAuth fail');
-          });
-        });
-      }
-    </script>
+    <link href="https://fonts.googleapis.com/css?family=Baskervville|Raleway|Lato:900|Titillium+Web&display=swap" rel="stylesheet">
 
     <title>Finance Calculator</title>
   </head>
@@ -63,6 +41,5 @@
       To begin the development, run `npm start` or `yarn start`.
       To create a production bundle, use `npm run build` or `yarn build`.
     -->
-    <script src="https://apis.google.com/js/platform.js?onload=init" async defer></script>
   </body>
 </html>
