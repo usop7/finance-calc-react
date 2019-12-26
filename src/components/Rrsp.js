@@ -5,7 +5,7 @@ import PieChart from 'react-minimal-pie-chart'
 import ReactTooltip from 'react-tooltip'
 import { FaQuestionCircle } from "react-icons/fa"
 
-export default class Savings extends React.Component 
+export default class Rrsp extends React.Component 
 {
 
   constructor(props) 

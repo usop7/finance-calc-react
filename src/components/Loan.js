@@ -51,22 +51,23 @@ export default class Loan extends React.Component
 
   calculate(event) 
   {
-    event.preventDefault();
+    if (event !== null)
+      event.preventDefault();
     
     // Variable Declaration
-    const loan = parseFloat(uncomma(this.state.loan));
-    const rate = this.state.rate;
-    const year = this.state.term;
+    const loan = this.state.loan === '' ? 0 : parseFloat(uncomma(this.state.loan));
+    const rate = this.state.rate === '' ? 0 : parseFloat(this.state.rate);
+    const year = this.state.term === '' ? 0 : this.state.term;
     const option = this.state.option;
 
     // Validation
     let isValid = false;
     console.log(loan, rate, year, option);
-    if (loan === '') {
+    if (loan === 0) {
       alert('Please fill in the Loan Amount');
     } else if (rate < 0) {
       alert('Interest Rate can not be a negative value')
-    } else if (year === 0 || year === '') {
+    } else if (year === 0) {
       alert('Please fill in the loan years')
     } else {
       isValid = true;
@@ -75,7 +76,6 @@ export default class Loan extends React.Component
     if (!isValid) {
       return;
     }
-
     
     // Calculation
     let balance = loan;
@@ -157,7 +157,7 @@ export default class Loan extends React.Component
         <Form onSubmit = {this.calculate} method="get">
           <Form.Group as={Row}>
             <Form.Label column sm={5}>
-              Loan Amount ($)
+              Loan Amount
             </Form.Label>
             <Col sm={7}>
               <Form.Control 
@@ -165,6 +165,7 @@ export default class Loan extends React.Component
                 type="text" 
                 name="loan" 
                 onChange={this.handleInputChange}
+                onBlur={this.calculate}
                 value={this.state.loan} />
             </Col>
           </Form.Group>
@@ -177,9 +178,11 @@ export default class Loan extends React.Component
               <Form.Control 
                   keyboardtype="decimal-pad"
                   type="number" 
+                  step="any"
                   name="rate" 
                   value={this.state.rate}
-                  onChange = {this.handleInputChange} />
+                  onChange = {this.handleInputChange}
+                  onBlur={this.calculate} />
             </Col>
           </Form.Group>
 
@@ -193,7 +196,8 @@ export default class Loan extends React.Component
                   type="number" 
                   name="term" 
                   value={this.state.term}
-                  onChange={this.handleInputChange} />
+                  onChange={this.handleInputChange}
+                  onBlur={this.calculate} />
             </Col>
           </Form.Group>
 
@@ -322,7 +326,7 @@ export default class Loan extends React.Component
               })}
             </tbody>
           </table>
-          
+          <div className='divider' />
         </div>
       )
     } else {

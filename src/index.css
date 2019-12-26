@@ -5,6 +5,7 @@ body {
 .appTitle {
   font-family: 'Titillium Web', sans-serif;
   font-size: 1.2em;
+  font-weight: bold;
   color: #484a4a;
 }
 
@@ -36,7 +37,7 @@ h1 {
 
 .smallContainer {
   width: 700px;
-  max-width: 100%;
+  max-width: 98%;
   margin: 1em auto;
 }
 

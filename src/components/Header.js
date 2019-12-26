@@ -8,7 +8,7 @@ export default class Header extends React.Component {
     return (
       <header>
         <Navbar expand="lg" bg="light" variant="light">
-        <Navbar.Brand href="/"><div className="appTitle"><b>Kim's Finance</b></div></Navbar.Brand>
+        <Navbar.Brand href="/"><div className="appTitle">Kim's Finance</div></Navbar.Brand>
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
         <Navbar.Collapse id="basic-navbar-nav">
             <Nav className="mr-auto">

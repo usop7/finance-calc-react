@@ -1,7 +1,9 @@
 import React from 'react'
 import { Container, Form, Row, Col, Button, Card } from 'react-bootstrap'
 import { inputNumberFormat, uncomma, comma } from '../js/comma.js'
-import PieChart from 'react-minimal-pie-chart';
+import PieChart from 'react-minimal-pie-chart'
+import ReactTooltip from 'react-tooltip'
+import { FaQuestionCircle } from "react-icons/fa"
 
 
 export default class Mortgage extends React.Component 
@@ -68,34 +70,31 @@ export default class Mortgage extends React.Component
 
     this.setState({
       [name]: value
-    },() => {
-      if (name === "option" && this.state.result !== '') {
-        this.calculate(event);
-      }
     });
   }
 
-  calculate(event) 
-  {
-    event.preventDefault();
+  calculate(event) {
+    if (event !== null)
+      event.preventDefault();
     
     // Variable Declaration
-    const home = parseFloat(uncomma(this.state.homePrice));
-    const down = parseFloat(uncomma(this.state.downPayment));
-    const rate = this.state.rate;
-    const year = this.state.term;
+    const home = this.state.homePrice === '' ? 0 : parseFloat(uncomma(this.state.homePrice));
+    const down = this.state.downPayment === '' ? 0 : parseFloat(uncomma(this.state.downPayment));
+    const rate = this.state.rate === '' ? 0 : parseFloat(this.state.rate);
+    const year = this.state.term === '' ? 0 : this.state.term;
     const option = this.state.option;
 
     // Validation
     let isValid = false;
     console.log(home, down, rate, year, option);
-    if (home === '') {
+    
+    if (home === 0) {
       alert('Please fill in the Home Price');
     } else if (down > home) {
       alert('Down Payment can not be greater than the Home Price');
     } else if (rate < 0) {
       alert('Interest Rate can not be a negative value')
-    } else if (year === 0 || year === '') {
+    } else if (year === 0) {
       alert('Please fill in the Mortgage years')
     } else {
       isValid = true;
@@ -187,7 +186,7 @@ export default class Mortgage extends React.Component
         <Form onSubmit = {this.calculate} method="get">
           <Form.Group as={Row}>
             <Form.Label column sm={5}>
-              Home Price ($)
+              Home Price
             </Form.Label>
             <Col sm={7}>
               <Form.Control 
@@ -201,7 +200,11 @@ export default class Mortgage extends React.Component
     
           <Form.Group as={Row}>
             <Form.Label column sm={5}>
-              Down Payment ($)
+              Down Payment&nbsp;
+              <a data-tip data-for='downpayment'><FaQuestionCircle /></a>
+              <ReactTooltip id='downpayment' type='success' effect="solid">
+                <span>An initial amount of money that <br/>you pay up front when buying a home.</span>
+              </ReactTooltip>
             </Form.Label>
             <Col>
               <Form.Control 
@@ -232,7 +235,7 @@ export default class Mortgage extends React.Component
               <Form.Control 
                   keyboardtype="decimal-pad"
                   type="number" 
-                  step=".01"
+                  step="any"
                   name = "rate" 
                   onChange = {this.handleInputChange}
                   value = {this.state.rate}
@@ -251,6 +254,7 @@ export default class Mortgage extends React.Component
                   name = "term" 
                   placeholder="25" 
                   onChange = {this.handleInputChange}
+                  //onBlur={this.calculate}
                   value = {this.state.term}
                   min = "1" />
             </Col>
