@@ -1,5 +1,5 @@
 import React from 'react'
-import { Container, Form, Row, Col, Button, Card, OverlayTrigger, Tooltip } from 'react-bootstrap'
+import { Container, Form, Row, Col, Button, Card } from 'react-bootstrap'
 import { inputNumberFormat, uncomma, comma } from '../js/comma.js'
 import PieChart from 'react-minimal-pie-chart'
 import { FaQuestionCircle } from "react-icons/fa"
@@ -181,15 +181,12 @@ export default class Savings extends React.Component
           <Form.Group as={Row}>
             <Form.Label column sm={5}>
               Rate of Return (%) &nbsp;
-              <OverlayTrigger
-                placement='top'
-                overlay={
-                  <Tooltip>
-                    The expected annual rate of return for this investment or an interest rate for a savings account.
-                  </Tooltip>
-                }>
+              <span 
+                onClick={() => alert("The expected annual rate of return for this investment or an interest rate for a savings account.")}
+                className="bigFont"
+              >
                 <FaQuestionCircle />
-              </OverlayTrigger>
+              </span>
             </Form.Label>
             <Col sm={7}>
               <Form.Control 
@@ -205,21 +202,12 @@ export default class Savings extends React.Component
           <Form.Group as={Row}>
             <Form.Label column sm={5}>
               Interest Compound&nbsp;
-              <OverlayTrigger
-                placement='top'
-                overlay={
-                  <Tooltip>
-                    It represents how often your savings
-                    interest is compounded. For savings 
-                    accounts, it depends on your product 
-                    and you can check with your financial 
-                    institution to find it out. For stocks 
-                    and funds, you should usually choose 
-                    'Compound Annually'.
-                  </Tooltip>
-                }>
+              <span 
+                onClick={() => alert("It represents how often your savings interest is compounded. For savings accounts, it depends on your product and you can check with your financial institution to find it out. For stocks and funds, you should usually choose 'Compound Annually'.")}
+                className="bigFont"
+              >
                 <FaQuestionCircle />
-              </OverlayTrigger>
+              </span>
             </Form.Label>
             <Col sm={7}>
               <Form.Control as="select" name="compound" value={this.state.compound} onChange={this.handleInputChange}>

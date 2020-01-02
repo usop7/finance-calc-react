@@ -1,5 +1,5 @@
 import React from 'react'
-import { Container, Form, Row, Col, Button, Card, OverlayTrigger, Tooltip } from 'react-bootstrap'
+import { Container, Form, Row, Col, Button, Card } from 'react-bootstrap'
 import { inputNumberFormat, uncomma, comma } from '../js/comma.js'
 import PieChart from 'react-minimal-pie-chart'
 import { FaQuestionCircle, FaSquare } from "react-icons/fa"
@@ -135,7 +135,7 @@ export default class Retirement extends React.Component {
   render () {
     return (
       <div className="smallContainer">
-        <div className="pageTitle">Retirement Pension Calculator</div>
+        <div className="pageTitle">Retirement Calculator</div>
         <p className="fontRailway marginBottom"><b>
           Estimate how much your retirement asset will be worth at retirement and how much pension income it will provide each year.
         </b></p>
@@ -197,16 +197,12 @@ export default class Retirement extends React.Component {
           <Form.Group as={Row}>
             <Form.Label column sm={6}>
               Rate of return before retirement (%) &nbsp;
-              <OverlayTrigger
-                placement='top'
-                overlay={
-                  <Tooltip>
-                    The expected annual rate of return for 
-                    your retirement asset while you're working.
-                  </Tooltip>
-                }>
+              <span 
+                onClick={() => alert("The expected annual rate of return for your retirement asset while you're working.")}
+                className="bigFont"
+              >
                 <FaQuestionCircle />
-              </OverlayTrigger>
+              </span>
             </Form.Label>
             <Col sm={6}>
               <Form.Control 
@@ -238,15 +234,12 @@ export default class Retirement extends React.Component {
           <Form.Group as={Row}>
             <Form.Label column sm={6}>
               Rate of return while retired (%) &nbsp;
-              <OverlayTrigger
-                placement='top'
-                overlay={
-                  <Tooltip>
-                    The expected annual rate of return for your retirement account after retirement, while receiving pension.
-                  </Tooltip>
-                }>
+              <span 
+                onClick={() => alert("The expected annual rate of return for your retirement account after retirement, while receiving pension.")}
+                className="bigFont"
+              >
                 <FaQuestionCircle />
-              </OverlayTrigger>
+              </span>
             </Form.Label>
             <Col sm={6}>
               <Form.Control 
@@ -261,7 +254,7 @@ export default class Retirement extends React.Component {
           </Form.Group>
 
           <Form.Group as={Row}>
-            <Col sm={{ span: 7, offset: 5 }}>
+            <Col sm={{ span: 6, offset: 6 }}>
               <Button variant="warning" type="submit" block>Calculate</Button>
             </Col>
           </Form.Group>

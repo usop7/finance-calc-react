@@ -1,5 +1,5 @@
 import React from 'react'
-import { Container, Form, Row, Col, Button, Card, OverlayTrigger, Tooltip } from 'react-bootstrap'
+import { Container, Form, Row, Col, Button, Card } from 'react-bootstrap'
 import { inputNumberFormat, uncomma, comma } from '../js/comma.js'
 import PieChart from 'react-minimal-pie-chart'
 import { FaQuestionCircle } from "react-icons/fa"
@@ -200,15 +200,12 @@ export default class Mortgage extends React.Component
           <Form.Group as={Row}>
             <Form.Label column sm={5}>
               Down Payment ($) &nbsp;
-              <OverlayTrigger
-                placement='top'
-                overlay={
-                  <Tooltip>
-                    An initial amount of money that you pay up front when buying a home.
-                  </Tooltip>
-                }>
+              <span 
+                onClick={() => alert("An initial amount of money that you pay up front when buying a home.")}
+                className="bigFont"
+              >
                 <FaQuestionCircle />
-              </OverlayTrigger>
+              </span>
             </Form.Label>
             <Col>
               <Form.Control 

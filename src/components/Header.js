@@ -15,7 +15,7 @@ export default class Header extends React.Component {
                 <Nav.Link href='/mortgage'>Mortgage Calculator</Nav.Link>
                 <Nav.Link href='/loan'>Loan Calculator</Nav.Link>
                 <Nav.Link href='/savings'>Savings Calculator</Nav.Link>
-                <Nav.Link href='/rrsp'>RRSP Calculator</Nav.Link>
+                <Nav.Link href='/retirement'>Retirement Calculator</Nav.Link>
             </Nav>
         </Navbar.Collapse>
         </Navbar>

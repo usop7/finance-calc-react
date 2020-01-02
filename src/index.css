@@ -133,3 +133,8 @@ a:hover {
   text-decoration: none;
   color: #929696;
 }
+
+.bigFont {
+  font-size: 1.2em;
+  color: #4C878B;
+}
