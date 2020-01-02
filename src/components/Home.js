@@ -7,8 +7,8 @@ class Home extends React.Component {
     return (
       <div>
         <h1>Easy to use, but Powerful</h1>
-        <p className="fontLato center">
-          Finance Calculators help you make smart financial decisions
+        <p className="fontLato center marginBottom">
+          Finance Calculators will help you understand your financial products better.
         </p>
         <CardDeck>
           <Card>
@@ -44,11 +44,11 @@ class Home extends React.Component {
           <Card>
             <Card.Img variant="top" src={require("../assets/images/retirement.png")}/>
             <Card.Body>
-              <Card.Title><b>RRSP Calculator</b></Card.Title>
+              <Card.Title><b>Retirement Calculator</b></Card.Title>
               <Card.Text>
-                Estimate how much your registered retirement savings plan (RRSP) will be worth at retirement and how much income it will provide each year.
+                Estimate how much your retirement account will be worth at retirement and how much pension income it will provide each year.
               </Card.Text>
-              <Button variant="warning" href="/mortgage">Calculate</Button>
+              <Button variant="warning" href="/retirement">Calculate</Button>
             </Card.Body>
           </Card>
         </CardDeck>

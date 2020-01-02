@@ -2,37 +2,43 @@ import React from 'react'
 import { Container, Form, Row, Col, Button, Card, OverlayTrigger, Tooltip } from 'react-bootstrap'
 import { inputNumberFormat, uncomma, comma } from '../js/comma.js'
 import PieChart from 'react-minimal-pie-chart'
-import { FaQuestionCircle } from "react-icons/fa"
+import { FaQuestionCircle, FaSquare } from "react-icons/fa"
+import { 
+  XYPlot,
+  XAxis,
+  YAxis,
+  VerticalGridLines,
+  HorizontalGridLines,
+  AreaSeries} from 'react-vis';
 
-export default class Savings extends React.Component 
-{
+export default class Retirement extends React.Component {
 
-  constructor(props) 
-  {
+  constructor(props) {
     super(props);
     this.state = {
       startingAmount: '5,000',
       contribution: '200',
-      rate: 3.5,
-      term: 10,
+      rate: 4.5,
+      term: 30,
       frequency: 'monthly',
-      compound: 'annually',
+      retirementYears: 25,
+      retirementRate: 2.0,
 
       showResult: false,
       result: '',
+      pension: '',
       totalInterest: 0,
       totalAmount: 0,
       detail_option: 0,
-      detail: [],
-      detailCum: [],
+      savingsDetail: [],
+      pensionDetail: [],
     }
 
     this.handleInputChange = this.handleInputChange.bind(this);
     this.calculate = this.calculate.bind(this);
   }
 
-  handleInputChange(event) 
-  {
+  handleInputChange(event) {
     event.persist();
     const name = event.target.name;
     let value = event.target.value;
@@ -46,8 +52,7 @@ export default class Savings extends React.Component
     });
   }
 
-  calculate(event) 
-  {
+  calculate(event) {
     event.preventDefault();
     
     // Variable Declaration
@@ -56,16 +61,11 @@ export default class Savings extends React.Component
     const rate = this.state.rate === '' ? 0 : parseFloat(this.state.rate);
     const year = this.state.term === '' ? 0 : parseInt(this.state.term);
     const frequencyStr = this.state.frequency;
-    const compoundStr = this.state.compound;
+    const retirementRate = this.state.retirementRate === '' ? 0 : parseFloat(this.state.retirementRate);
+    const retirementYears = this.state.retirementYears === '' ? 0 : parseFloat(this.state.retirementYears);
 
     // Compound
     let compound = 1;
-    if (compoundStr === "monthly")
-      compound = 12;
-    else if (compoundStr === "daily")
-      compound = 365;
-    else if (compoundStr === "quaterly")
-      compound = 4;
 
     // Contribution
     let frequency = 1;
@@ -83,23 +83,14 @@ export default class Savings extends React.Component
     const s1 = (Math.pow(1 + i_f, frequency) - 1) / i_f;
 
     let result = startingAmount, totalPrincipal = startingAmount, totalInterest = 0, yearStart = 0;
-    let detailArray = [];
-    let detailCumArray = [];
-
+    let savingsDetail = [];
     for (let t = 1; t <= year; t++) {
       totalPrincipal += (contribution * frequency);
       yearStart = result;
-      result = yearStart * Math.pow(1 + i, compound) + contribution * s1;
+      result = result * Math.pow(1 + i, compound) + contribution * s1;
       totalInterest = result - totalPrincipal;
 
-      detailCumArray = detailCumArray.concat({
-        Year: t, 
-        Principal: comma(Math.round(totalPrincipal, 0)),
-        Interest: comma(Math.round(totalInterest, 0)), 
-        Balance: comma(Math.round(result, 0))
-      });
-
-      detailArray = detailArray.concat({
+      savingsDetail = savingsDetail.concat({
         Year: t, 
         Principal: comma(Math.round(contribution * frequency, 0)),
         Interest: comma(Math.round(result - (contribution * frequency) - yearStart, 0)), 
@@ -107,43 +98,66 @@ export default class Savings extends React.Component
       });
     }
 
+    // Pension Calculation
+    const i_p = retirementRate/100;
+    const v_p = (1 - Math.pow(1/(1+i_p), retirementYears)) / i_p * (1+i_p);
+    const pension = result/v_p;
+    let balance = result;
+    let interest = 0;
+    let pensionDetail = [];
+    for (let t = 1; t <= retirementYears; t++) {
+        interest = (balance - pension) * i_p;
+        balance = balance - pension + interest;
+  
+        pensionDetail = pensionDetail.concat({
+          Year: t, 
+          Principal: comma(Math.round(pension, 0)),
+          Interest: comma(Math.round(interest, 0)),
+          Balance: comma(Math.round(balance, 0))
+        });
+    }
+
     // Display Results
     this.setState({
-      showResult: true,
-      result: comma(Math.round(result, 0)),
-      totalPrincipal: comma(Math.round(totalPrincipal, 0)), 
-      totalInterest: comma(Math.round(totalInterest, 0)),
-      detail: detailArray,
-      detailCum: detailCumArray,
-    }, () => {
-      const resultDiv = document.getElementById("resultDiv");
-      resultDiv.scrollIntoView();
-    });
+        showResult: true,
+        result: comma(Math.round(result, 0)),
+        totalPrincipal: comma(Math.round(totalPrincipal, 0)), 
+        totalInterest: comma(Math.round(totalInterest, 0)),
+        pension: comma(Math.round(pension, 0)),
+        savingsDetail: savingsDetail,
+        pensionDetail: pensionDetail,
+      }, () => {
+        const resultDiv = document.getElementById("resultDiv");
+        resultDiv.scrollIntoView();
+      });
   }
 
   render () {
     return (
       <div className="smallContainer">
-        <div className="pageTitle">Savings Calculator</div>
-        <p className="fontRailway marginBottom"><b>Estimate how much your investment will be worth after a certain period.</b></p>
+        <div className="pageTitle">Retirement Pension Calculator</div>
+        <p className="fontRailway marginBottom"><b>
+          Estimate how much your retirement asset will be worth at retirement and how much pension income it will provide each year.
+        </b></p>
         <Form onSubmit = {this.calculate} method="get">
           <Form.Group as={Row}>
-            <Form.Label column sm={5}>
-              Starting Amount ($)
+            <Form.Label column sm={6}>
+              Amount currently in retirement account ($)
             </Form.Label>
-            <Col sm={7}>
+            <Col sm={6}>
               <Form.Control 
                 keyboardtype="number-pad"
                 type="text" 
                 name="startingAmount" 
                 onChange={this.handleInputChange}
-                value={this.state.startingAmount} />
+                value={this.state.startingAmount}
+                min = "0" />
             </Col>
           </Form.Group>
 
           <Form.Group as={Row}>
-            <Form.Label column sm={5}>
-              Additional Contribution ($)
+            <Form.Label column sm={6}>
+              Contribution amount and frequency
             </Form.Label>
             <Col>
               <Form.Control 
@@ -151,7 +165,8 @@ export default class Savings extends React.Component
                 type="text" 
                 name="contribution" 
                 onChange={this.handleInputChange}
-                value={this.state.contribution} />
+                value={this.state.contribution}
+                min = "0" />
             </Col>
             <Col>
               <Form.Control as="select" name="frequency" value={this.state.frequency} onChange={this.handleInputChange}>
@@ -165,69 +180,83 @@ export default class Savings extends React.Component
           </Form.Group>
 
           <Form.Group as={Row}>
-            <Form.Label column sm={5}>
-              Years to Save
+            <Form.Label column sm={6}>
+              Number of years until retirement
             </Form.Label>
-            <Col sm={7}>
+            <Col sm={6}>
               <Form.Control 
                   keyboardtype="number-pad"
                   type="number" 
                   name="term" 
                   value={this.state.term}
-                  onChange={this.handleInputChange} />
+                  onChange={this.handleInputChange}
+                  min = "0" />
             </Col>
           </Form.Group>
     
           <Form.Group as={Row}>
-            <Form.Label column sm={5}>
-              Rate of Return (%) &nbsp;
+            <Form.Label column sm={6}>
+              Rate of return before retirement (%) &nbsp;
               <OverlayTrigger
                 placement='top'
                 overlay={
                   <Tooltip>
-                    The expected annual rate of return for this investment or an interest rate for a savings account.
+                    The expected annual rate of return for 
+                    your retirement asset while you're working.
                   </Tooltip>
                 }>
                 <FaQuestionCircle />
               </OverlayTrigger>
             </Form.Label>
-            <Col sm={7}>
+            <Col sm={6}>
               <Form.Control 
                   keyboardtype="decimal-pad"
                   type="number" 
                   step="any"
                   name="rate" 
                   value={this.state.rate}
-                  onChange = {this.handleInputChange} />
+                  onChange = {this.handleInputChange}
+                  min = "0" />
             </Col>
           </Form.Group>
 
           <Form.Group as={Row}>
-            <Form.Label column sm={5}>
-              Interest Compound&nbsp;
+            <Form.Label column sm={6}>
+              Estimated number of years in retirement
+            </Form.Label>
+            <Col sm={6}>
+              <Form.Control 
+                  keyboardtype="number-pad"
+                  type="number" 
+                  name="retirementYears" 
+                  value={this.state.retirementYears}
+                  onChange={this.handleInputChange}
+                  min = "0" />
+            </Col>
+          </Form.Group>
+    
+          <Form.Group as={Row}>
+            <Form.Label column sm={6}>
+              Rate of return while retired (%) &nbsp;
               <OverlayTrigger
                 placement='top'
                 overlay={
                   <Tooltip>
-                    It represents how often your savings
-                    interest is compounded. For savings 
-                    accounts, it depends on your product 
-                    and you can check with your financial 
-                    institution to find it out. For stocks 
-                    and funds, you should usually choose 
-                    'Compound Annually'.
+                    The expected annual rate of return for your retirement account after retirement, while receiving pension.
                   </Tooltip>
                 }>
                 <FaQuestionCircle />
               </OverlayTrigger>
             </Form.Label>
-            <Col sm={7}>
-              <Form.Control as="select" name="compound" value={this.state.compound} onChange={this.handleInputChange}>
-                <option value="annually">Compound Annually</option>
-                <option value="quaterly">Compound Quaterly</option>
-                <option value="monthly">Compound Monthly</option>
-                <option value="daily">Compound Daily</option>
-              </Form.Control>
+            <Col sm={6}>
+              <Form.Control 
+                  keyboardtype="decimal-pad"
+                  type="number" 
+                  step="any"
+                  name="retirementRate" 
+                  value={this.state.retirementRate}
+                  onChange = {this.handleInputChange}
+                  min = "0" />
             </Col>
           </Form.Group>
 
@@ -248,23 +277,39 @@ export default class Savings extends React.Component
       const principal = this.state.totalPrincipal;
       const interest = this.state.totalInterest;
       const result = this.state.result;
+      const retirementYear = this.state.term;
+      const endYear = retirementYear + this.state.retirementYears;
+      const numResult = parseFloat(Math.round(uncomma(result)/1000, 0));
       const chartData = [
         { title: 'Principal', value: parseFloat(uncomma(principal)), color: '#87c0c4' },
         { title: 'Interest', value: parseFloat(uncomma(interest)), color: '#ffc74f' },
       ];
       return (
         <div id="resultDiv">
+          <p className="sectionTitle">Results</p>
+          <p>
+            At retirement, your retirement savings will be worth <b>${result}</b>, which will provide an annual pension of <b>${this.state.pension}</b> for {this.state.retirementYears} years of your retirement.
+          </p>
           <Card bg="light">
             <Card.Body>
-              <div className="center">Estimated Total Savings</div>
-              <h1 className="center">$ {result}</h1>
-              <p className="center">after {this.state.term} years</p>
+            <Container>
+                <Row>
+                    <Col sm={6}>
+                        <div className="center marginTop">Total retirement savings at retirement</div>
+                        <h1 className="center">$ {result}</h1>
+                    </Col>
+                    <Col sm={6}>
+                        <div className="center marginTop">Annual pension income</div>
+                        <h1 className="center">$ {this.state.pension}</h1>
+                    </Col>
+                </Row>
+            </Container>
             </Card.Body>
           </Card>
 
-          <p className="sectionTitle">Results Summary</p>
+          <p className="sectionTitle">Retirement Savings</p>
           <p>
-            Your estimated balance of <b>${result}</b> consists of principal and interest.<br/>
+            Your estimated savings balance of <b>${result}</b> consists of principal and interest.<br/>
           </p>
           <Card><Card.Body>
             <PieChart
@@ -295,13 +340,43 @@ export default class Savings extends React.Component
             </Container>
           </Card.Body></Card>
 
-          <p className="sectionTitle">Balance by Year</p>          
+          <p className="sectionTitle">Balance by Year</p>
+
+          <Card><Card.Body>
+            <p className="marginTop marginBottom">
+              <span className="fontPrimary"><FaSquare /></span> Working phase &nbsp; <span className="fontYellow"><FaSquare /></span> Retirement phase
+            </p>
+            <XYPlot width={300} height={250}>
+              <VerticalGridLines />
+              <HorizontalGridLines />
+              <XAxis />
+              <YAxis title="Total Amount($K)"/>
+              <AreaSeries
+                className="area-elevated-series-1"
+                color="#5CA4A9"
+                data={[
+                  {x: 0, y: 0},
+                  {x: retirementYear, y: numResult}
+                ]}
+              />
+              <AreaSeries
+                className="area-elevated-series-2"
+                color="#ffc74f"
+                data={[
+                  {x: retirementYear, y: numResult},
+                  {x: endYear, y: 0}
+                ]}
+              />
+          </XYPlot>
+        </Card.Body></Card>
+        <div className="divider" />
+          
           <Form>
               <div key="inline-radio" className="mb-3">
                 <Form.Check 
                   inline 
                   name="schedule"
-                  label="Each Year" 
+                  label="Before Retirement" 
                   type="radio" 
                   checked={this.state.detail_option === 0}
                   onChange={() => this.setState({detail_option: 0})}
@@ -309,7 +384,7 @@ export default class Savings extends React.Component
                 <Form.Check 
                   inline 
                   name="schedule"
-                  label="Cumulative" 
+                  label="After Retirement" 
                   type="radio" 
                   onChange={() => this.setState({detail_option: 1})}
                   id="radio-year"/>
@@ -319,17 +394,17 @@ export default class Savings extends React.Component
             <tbody>
               <tr className="trAmortization tableHeader">
                 <td>Year</td>
-                <td>Contribution</td>
+                <td>{this.state.detail_option === 0 ? "Contribution" : "Pension"}</td>
                 <td>Interest</td>
                 <td>Balance</td>
               </tr>
               <tr className="trAmortization">
                 <td>Start</td>
-                <td>{this.state.startingAmount}</td>
+                <td>{this.state.detail_option === 0 ?  this.state.startingAmount : ""}</td>
                 <td></td>
-                <td className="fontPrimary">{this.state.startingAmount}</td>
+                <td className="fontPrimary">{this.state.detail_option === 0 ? this.state.startingAmount : result}</td>
               </tr>
-              {(this.state.detail_option === 0 ? this.state.detail : this.state.detailCum).map((row, index) => {
+              {(this.state.detail_option === 0 ? this.state.savingsDetail : this.state.pensionDetail).map((row, index) => {
                 return (
                     <tr key={index} className="trAmortization">
                       <td>{row.Year}</td>

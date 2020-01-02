@@ -12,8 +12,9 @@ body {
 h1 {
   font-family: 'Lato', sans-serif;
   color: #656868;
-  margin-top: 20px;
   text-align: center;
+  margin-top: 10px;
+  margin-bottom: 10px;
 }
 
 .fontLato {
@@ -75,6 +76,10 @@ h1 {
   color: #4C878B;
 }
 
+.fontYellow {
+  color: #ffc74f;
+}
+
 .center {
   text-align: center;
 }
@@ -83,8 +88,19 @@ h1 {
   height: 30px;
 }
 
+.lineDivider {
+  height: 15px;
+  width: 100%;
+  border-bottom: 1px sold gray;
+  margin-bottom: 15px;
+}
+
 .marginBottom {
   margin-bottom: 30px;
+}
+
+.marginTop {
+  margin-top: 20px;
 }
 
 .appImage {

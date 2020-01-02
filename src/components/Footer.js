@@ -7,7 +7,7 @@ export default class Footer extends React.Component {
     return (
       <footer className="footer">
         <div className="footerDiv">
-            <a href='/legal' variant="light">Legal Disclaimers</a>
+            <a href='/legal' variant="light">Disclaimers & Privacy policy</a>
         </div>
       </footer>
     )

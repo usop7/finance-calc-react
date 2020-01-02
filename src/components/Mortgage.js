@@ -1,8 +1,7 @@
 import React from 'react'
-import { Container, Form, Row, Col, Button, Card } from 'react-bootstrap'
+import { Container, Form, Row, Col, Button, Card, OverlayTrigger, Tooltip } from 'react-bootstrap'
 import { inputNumberFormat, uncomma, comma } from '../js/comma.js'
 import PieChart from 'react-minimal-pie-chart'
-import ReactTooltip from 'react-tooltip'
 import { FaQuestionCircle } from "react-icons/fa"
 
 
@@ -182,11 +181,11 @@ export default class Mortgage extends React.Component
     return (
       <div className="smallContainer">
         <div className="pageTitle">Mortgage Calculator</div>
-        <p className="fontRailway marginBottom"><b>Quickly See What Your Mortgage Payments Might Look Like</b></p>
+        <p className="fontRailway marginBottom"><b>Estimate how much your mortgage payment amout will be and how principal and interest calculated on each payment.</b></p>
         <Form onSubmit = {this.calculate} method="get">
           <Form.Group as={Row}>
             <Form.Label column sm={5}>
-              Home Price
+              Home Price ($)
             </Form.Label>
             <Col sm={7}>
               <Form.Control 
@@ -200,11 +199,16 @@ export default class Mortgage extends React.Component
     
           <Form.Group as={Row}>
             <Form.Label column sm={5}>
-              Down Payment&nbsp;
-              <a data-tip data-for='downpayment'><FaQuestionCircle /></a>
-              <ReactTooltip id='downpayment' type='success' effect="solid">
-                <span>An initial amount of money that <br/>you pay up front when buying a home.</span>
-              </ReactTooltip>
+              Down Payment ($) &nbsp;
+              <OverlayTrigger
+                placement='top'
+                overlay={
+                  <Tooltip>
+                    An initial amount of money that you pay up front when buying a home.
+                  </Tooltip>
+                }>
+                <FaQuestionCircle />
+              </OverlayTrigger>
             </Form.Label>
             <Col>
               <Form.Control 

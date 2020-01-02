@@ -153,11 +153,11 @@ export default class Loan extends React.Component
     return (
       <div className="smallContainer">
         <div className="pageTitle">Loan Calculator</div>
-        <p className="fontRailway marginBottom"><b>Quickly See What Your Loan Payments Might Look Like</b></p>
+        <p className="fontRailway marginBottom"><b>Estimate how much your loan payment amout will be and how principal and interest calculated on each payment.</b></p>
         <Form onSubmit = {this.calculate} method="get">
           <Form.Group as={Row}>
             <Form.Label column sm={5}>
-              Loan Amount
+              Loan Amount ($)
             </Form.Label>
             <Col sm={7}>
               <Form.Control 
