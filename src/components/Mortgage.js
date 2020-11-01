@@ -85,7 +85,6 @@ export default class Mortgage extends React.Component
 
     // Validation
     let isValid = false;
-    console.log(home, down, rate, year, option);
     
     if (home === 0) {
       alert('Please fill in the Home Price');

@@ -62,7 +62,6 @@ export default class Loan extends React.Component
 
     // Validation
     let isValid = false;
-    console.log(loan, rate, year, option);
     if (loan === 0) {
       alert('Please fill in the Loan Amount');
     } else if (rate < 0) {
