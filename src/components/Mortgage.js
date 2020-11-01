@@ -12,11 +12,11 @@ export default class Mortgage extends React.Component
   {
     super(props);
     this.state = {
-      homePrice: '300,000',
-      downPayment: '60,000',
+      homePrice: '400,000',
+      downPayment: '80,000',
       downRate: '20',
-      rate: 3.1,
-      term: 25,
+      rate: 2.5,
+      term: 30,
       option: 'monthly',
 
       showResult: false,
